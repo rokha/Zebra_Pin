@@ -140,6 +140,20 @@
          *  @return void
          */
         plugin.update = function() {
+            var outer_width = function(el) {
+                var computed, w;
+
+                if (window.getComputedStyle) {
+                    computed = window.getComputedStyle(el[0]);
+                    w = parseFloat(computed.getPropertyValue('width')) + parseFloat(computed.getPropertyValue('margin-left')) + parseFloat(computed.getPropertyValue('margin-right'));
+                    if (computed.getPropertyValue('box-sizing') !== 'border-box')
+                        w += parseFloat(computed.getPropertyValue('border-left-width')) + parseFloat(computed.getPropertyValue('border-right-width')) + parseFloat(computed.getPropertyValue('padding-left')) + parseFloat(computed.getPropertyValue('padding-right'));
+
+                    return w;
+                }
+
+                return el.outerWidth(true);
+            };
 
             // iterate through elements that need to be pinned
             elements.each(function(index) {
@@ -170,7 +184,8 @@
                     height = $element.outerHeight(),
 
                     // get the element's width, including padding and border
-                    width = $element.outerWidth(),
+                    // width = $element.outerWidth(),
+                    width = outer_width($element),
 
                     // get margins, if any; we need this because position() takes margins into account while offset()
                     // doesn't and so we need to compensate
@@ -361,7 +376,7 @@
 
                                 position:   'absolute',
                                 left:       position.left,
-                                top:        container_height - height - plugin.settings.bottom_spacing - plugin.settings.bottom_spacing
+                                top:        container_height - height - plugin.settings.top_spacing - plugin.settings.bottom_spacing - margin_top
 
                             // add a class indicating that the element reached the container element's bottom
                             }).addClass('Zebra_Pin_Contained');
